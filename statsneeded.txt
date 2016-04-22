@@ -6,3 +6,26 @@ Endurance -
 Vitality - 
 	Physical Defense	
 	Poison Resistance
+
+Strength
+	Fire Defense
+
+Dexterity
+	Casting Speed
+	Fall damage(?)
+
+Intelligence
+	magic attack bonus*
+	fire attack bonus*
+	magic defense
+
+Luck
+	Item discovery
+	Bleed bonus
+	poison bonus
+	curse resistance
+
+Faith 
+	Dark defense
+
+* possibly not by level
