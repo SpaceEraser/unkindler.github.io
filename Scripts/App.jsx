@@ -169,14 +169,15 @@ var UnkindlerApp = React.createClass({
 						buildStats={characterBuild.getBuildStatsByCategory('base')} />
 
 						<StatsSection 
-						title="Defense"    
-						buildStats={characterBuild.getBuildStatsByCategory('defense')} />
+						title="Attack"      
+						buildStats={characterBuild.getBuildStatsByCategory('attack')} />
 					</div>
 
 					<div className="buildSection">
 						<StatsSection 
-						title="Attack"      
-						buildStats={characterBuild.getBuildStatsByCategory('attack')} />
+						title="Defense"    
+						buildStats={characterBuild.getBuildStatsByCategory('defense')} />
+
 						<StatsSection 
 						title="Resistances" 
 						buildStats={characterBuild.getBuildStatsByCategory('resistances')} />
