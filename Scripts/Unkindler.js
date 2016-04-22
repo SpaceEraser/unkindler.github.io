@@ -180,7 +180,12 @@ CharacterStats.addStat(new CharacterStat(
 	'How many focus points you will have.',
 	function(character){
 		switch(character.getCharacterAttributeTotal('Attunement')){
-			default: return 72;//case 6
+			case 1: return 50;
+			case 2: return 53;
+			case 3: return 58;
+			case 4: return 62;
+			case 5: return 67;
+			case 6: return 72;
 			case 7: return 77;
 			case 8: return 82;
 			case 9: return 87;
@@ -275,6 +280,7 @@ CharacterStats.addStat(new CharacterStat(
 			case 98: return 448;
 			case 99: return 450;
 		}
+		return -1;
 	}
 ));
 
@@ -290,6 +296,116 @@ CharacterStats.addStat(new CharacterStat(
 		});
 
 		return soulLevel;
+	}
+));
+
+CharacterStats.addStat(new CharacterStat(
+	'Frost Resistance',
+	'resistances',
+	'Resistance to frost',
+	function(character){
+		switch(character.getCharacterAttributeTotal('Vigor')){
+			case 1: return 91;
+			case 2: return 91;
+			case 3: return 92;
+			case 4: return 92;
+			case 5: return 92;
+			case 6: return 92;
+			case 7: return 92;
+			case 8: return 93;
+			case 9: return 93;
+			case 10: return 93;
+			case 11: return 93;
+			case 12: return 93;
+			case 13: return 94;
+			case 14: return 94;
+			case 15: return 94;
+			case 16: return 94;
+			case 17: return 94;
+			case 18: return 95;
+			case 19: return 95;
+			case 20: return 95;
+			case 21: return 95;
+			case 22: return 95;
+			case 23: return 96;
+			case 24: return 96;
+			case 25: return 96;
+			case 26: return 96;
+			case 27: return 96;
+			case 28: return 97;
+			case 29: return 97;
+			case 30: return 97;
+			case 31: return 100;
+			case 32: return 103;
+			case 33: return 107;
+			case 34: return 110;
+			case 35: return 113;
+			case 36: return 116;
+			case 37: return 119;
+			case 38: return 123;
+			case 39: return 126;
+			case 40: return 129;
+			case 41: return 130;
+			case 42: return 130;
+			case 43: return 131;
+			case 44: return 132;
+			case 45: return 132;
+			case 46: return 133;
+			case 47: return 134;
+			case 48: return 135;
+			case 49: return 135;
+			case 50: return 136;
+			case 51: return 137;
+			case 52: return 137;
+			case 53: return 138;
+			case 54: return 139;
+			case 55: return 139;
+			case 56: return 140;
+			case 57: return 141;
+			case 58: return 142;
+			case 59: return 142;
+			case 60: return 143;
+			case 61: return 143;
+			case 62: return 144;
+			case 63: return 144;
+			case 64: return 145;
+			case 65: return 145;
+			case 66: return 146;
+			case 67: return 146;
+			case 68: return 147;
+			case 69: return 147;
+			case 70: return 148;
+			case 71: return 148;
+			case 72: return 148;
+			case 73: return 149;
+			case 74: return 149;
+			case 75: return 150;
+			case 76: return 150;
+			case 77: return 151;
+			case 78: return 151;
+			case 79: return 152;
+			case 80: return 152;
+			case 81: return 153;
+			case 82: return 153;
+			case 83: return 154;
+			case 84: return 154;
+			case 85: return 154;
+			case 86: return 155;
+			case 87: return 155;
+			case 88: return 156;
+			case 89: return 156;
+			case 90: return 157;
+			case 91: return 157;
+			case 92: return 158;
+			case 93: return 158;
+			case 94: return 159;
+			case 95: return 159;
+			case 96: return 159;
+			case 97: return 160;
+			case 98: return 160;
+			case 99: return 161;
+		}
+		return -1;
 	}
 ));
 

@@ -38,7 +38,7 @@ var StatsSection = React.createClass({
 
 		return(
 			<div className="buildStatsSection">
-				<div class="buildStatsSectionHeader">{this.props.title}</div>
+				<div className="buildStatsSectionHeader">{this.props.title}</div>
 				{buildStats}
 			</div>
 		);
@@ -108,6 +108,7 @@ var AttributesSection = React.createClass({
 
 		return (
 			<div className="attributesSection">
+				<div className="attributesSectionHeader">Attributes</div>
 				{attributes}
 			</div>
 		);
@@ -145,14 +146,21 @@ var UnkindlerApp = React.createClass({
 					<h1 className="headerTitle"></h1>
 				</div>
 				<div className="appBody">
+
 					<div className="buildSection">
 						<StatsSection 
 						title="Level" 
 						buildStats={characterBuild.getBuildStatsByCategory('level')} />
 
+						<ClassPicker 
+							classes={this.props.classes.getCharacterClasses()}
+							characterClass={characterBuild.characterClass}
+							handleCharacterClassChange={this.handleCharacterClassChange} />
+
 						<AttributesSection 
 						characterBuild={characterBuild}
 						handleCharacterAttributeChange={this.handleCharacterAttributeChange} />
+					
 					</div>
 
 					<div className="buildSection">
@@ -168,16 +176,11 @@ var UnkindlerApp = React.createClass({
 					<div className="buildSection">
 						<StatsSection 
 						title="Attack"      
-						stats={characterBuild.getBuildStatsByCategory('attack')} />
+						buildStats={characterBuild.getBuildStatsByCategory('attack')} />
 						<StatsSection 
 						title="Resistances" 
-						stats={characterBuild.getBuildStatsByCategory('resistances')} />
+						buildStats={characterBuild.getBuildStatsByCategory('resistances')} />
 					</div>
-
-					<ClassPicker 
-						classes={this.props.classes.getCharacterClasses()}
-						characterClass={characterBuild.characterClass}
-						handleCharacterClassChange={this.handleCharacterClassChange} />
 				</div>
 			</div>
 		);

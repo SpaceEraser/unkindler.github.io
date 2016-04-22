@@ -1,0 +1,8 @@
+Endurance - 
+	Stamina	
+	Lightning Defense	
+	Bleed Resistance
+
+Vitality - 
+	Physical Defense	
+	Poison Resistance
