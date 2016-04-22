@@ -1,15 +1,21 @@
 var ClassPicker = React.createClass({
+	handleCharacterClassChange: function(event){
+         this.props.handleCharacterClassChange(event.target.value);// character class id
+	},
 	render: function(){
 		var classes = [];
 
 		this.props.classes.forEach(function(cl,i){
 			classes.push(
-				<option value="{cl.id}">{cl.title}</option>
+				<option key={cl.id} value={cl.id}>{cl.title}</option>
 			);
 		});
 
 		return (
-			<select className="characterClassPicker">
+			<select 
+			className="characterClassPicker" 
+			onChange={this.handleCharacterClassChange} 
+			value={this.props.characterClass.id}>
 				{classes}
 			</select>
 		);
@@ -18,69 +24,90 @@ var ClassPicker = React.createClass({
 
 var StatsSection = React.createClass({
 	render: function(){
-		
-	}
-});
-
-var BuildStatsSection = React.createClass({
-	render: function(){
 		var buildStats = [];
 
-		this.props.buildStats.forEach(function(buildStat,i){
-			buildStats.push(
-				<div id={buildStat.stat.id}>
-					{buildStat.stat.title} - {buildStat.value}
-				</div>
-			);
-		});
+		if(this.props.buildStats){
+			this.props.buildStats.forEach(function(buildStat,i){
+				buildStats.push(
+					<div key={buildStat.stat.id}>
+						{buildStat.stat.title} - {buildStat.value}
+					</div>
+				);
+			});
+		}
 
 		return(
 			<div className="buildStatsSection">
+				<div class="buildStatsSectionHeader">{this.props.title}</div>
 				{buildStats}
 			</div>
 		);
 	}
 });
 
-var UnkindlerApp = React.createClass({
+var AttributesSection = React.createClass({
 	render: function(){
-		var build = this.props.build;
+		return (
+			<div>This is the attributes section</div>
+		);
+	}
+});
+
+var UnkindlerApp = React.createClass({
+	getInitialState: function(){
+		return {
+			characterBuild: this.props.initialCharacterBuild
+		};
+	},
+	handleCharacterClassChange: function(newClassId){
+		var newCharacterClass = this.props.classes.getCharacterClassById(newClassId);
+		
+		this.state.characterBuild.setCharacterClass(newCharacterClass);
+		
+		this.setState({
+			characterBuild: this.state.characterBuild
+		});
+	},
+	render: function(){
+		var characterBuild = this.state.characterBuild;
 
 		return (
 			<div className="unkindlerApp">
 				<div className="appheader">
-					<h1 className="headerTitle">Unkindler</h1>
+					<h1 className="headerTitle"></h1>
 				</div>
 				<div className="appBody">
-					<div class="buildSection">
-						<StatsSection title="Level" stats={build.getStatsByCategory('level')} />
+					<div className="buildSection">
+						<StatsSection title="Level" buildStats={characterBuild.getBuildStatsByCategory('level')} />
 
-						<AttributesSection />
+						<AttributesSection characterBuild={characterBuild} />
 					</div>
 
-					<div class="buildSection">
-						<StatsSection title="Base Stats" stats={build.getStatsByCategory('base')} />
-						<StatsSection title="Defense"    stats={build.getStatsByCategory('defense')} />
+					<div className="buildSection">
+						<StatsSection title="Base Stats" buildStats={characterBuild.getBuildStatsByCategory('base')} />
+						<StatsSection title="Defense"    buildStats={characterBuild.getBuildStatsByCategory('defense')} />
 					</div>
 
-					<div class="buildSection">
-						<StatsSection title="Attack"      stats={build.getStatsByCategory('attack')} />
-						<StatsSection title="Resistances" stats={build.getStatsByCategory('resistances')} />
+					<div className="buildSection">
+						<StatsSection title="Attack"      stats={characterBuild.getBuildStatsByCategory('attack')} />
+						<StatsSection title="Resistances" stats={characterBuild.getBuildStatsByCategory('resistances')} />
 					</div>
 
 					<ClassPicker 
-						classes={this.props.classes.getCharacterClasses()} />
+						classes={this.props.classes.getCharacterClasses()}
+						characterClass={characterBuild.characterClass}
+						handleCharacterClassChange={this.handleCharacterClassChange} />
 				</div>
 			</div>
 		);
 	}	
 });
 
-var characterBuild = new CharacterBuild(CharacterClasses.getCharacterClassById(0));
+var characterBuild = new CharacterBuild(CharacterClasses.getCharacterClassByName('Knight'));
 
 ReactDOM.render(
 	<UnkindlerApp 
-		build={characterBuild}
+		initialCharacterBuild={characterBuild}
 		classes={CharacterClasses} 
 		stats={CharacterStats} />,
 	document.getElementById('unkindlerHook')

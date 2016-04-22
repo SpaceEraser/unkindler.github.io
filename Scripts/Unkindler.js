@@ -5,6 +5,14 @@
 //						stats = (calculated) a thing about the character affected by attributes (HP, FP, etc.)
 //											
 // ------------------------------------------------------------
+CharacterAttribute = function(){
+	this.id = -1;
+	this.title = title;
+	this.description = description;
+	this.min = min;
+	this.max = max;
+	this.value = value;
+}
 
 CharacterStat = function(title,category,description,valueCalcFunc){
 	this.id = -1;
@@ -278,6 +286,21 @@ CharacterStats.addStat(new CharacterStat(
 	}
 ));
 
+CharacterStats.addStat(new CharacterStat(
+	'Soul Level',
+	'level',
+	'Total levels needed for this build',
+	function(character){
+		var soulLevel = character.characterClass.baseLevel;
+
+		for(var p in character.attributeInvestments){
+			soulLevel += character.attributeInvestments[p];
+		}
+
+		return soulLevel;
+	}
+));
+
 // ------------------------------------------------------------
 // 					Character base classes
 // ------------------------------------------------------------
@@ -314,6 +337,15 @@ CharacterClasses = function(){
 		},
 		getCharacterClassById: function(id){
 			return _classes[id];
+		},
+		getCharacterClassByName: function(title){
+			for(var i=0;i<_classes.length;i++){
+				if(_classes[i].title == title){
+					return _classes[i];
+				}
+			}
+
+			return false;
 		}
 	};
 }();
@@ -333,16 +365,37 @@ CharacterClasses.addCharacterClass(new CharacterClass(  'Deprived',  1, new Char
 //					The user's character build
 // ------------------------------------------------------------
 
+CharacterBuildStat = function(stat,value){
+	this.stat = stat;
+	this.value = value;
+}
+
 CharacterBuild = function(characterClass){
 	this.title = 'Untitled';
 	this.characterClass = characterClass || CharacterClasses.getCharacterClass('Deprived');
-	this.attributeInvestments = new CharacterAttributeSet();
+	this.attributeInvestments = new CharacterAttributeSet(0,0,0,0,0,0,0,0,0);
+}
+
+CharacterBuild.prototype.getBuildStatsByCategory = function(category){
+	var build = this;
+	var stats = CharacterStats.getStatsByCategory(category);
+	var buildStats = [];
+
+	stats.forEach(function(stat,i){
+		buildStats.push(new CharacterBuildStat(stat,stat.getValueFor(build)));
+	});
+
+	return buildStats;
 }
 
 CharacterBuild.prototype.getLevel = function(){
-	return this.characterClass.baseLevel	+ this.investedLevels;
+	return this.characterClass.baseLevel + this.investedLevels;
 }
 
 CharacterBuild.prototype.getAttributeValue = function(attribute){
 	return this.characterClass.baseAttributes[attribute] + this.attributeInvestments[attribute];
+}
+
+CharacterBuild.prototype.setCharacterClass = function(characterClass){
+	this.characterClass = characterClass;
 }
