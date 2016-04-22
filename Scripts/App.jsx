@@ -69,6 +69,8 @@ var AttributeRow = React.createClass({
 	render: function(){
 		return (
 			<div className="attributeRow">
+				<span className="attributeTitle" >{this.props.attribute}</span>
+
 				<span className="attributeBaseValue">{this.props.baseValue}</span>
 				
 				<span>
