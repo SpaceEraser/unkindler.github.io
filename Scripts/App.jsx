@@ -22,6 +22,34 @@ var ClassPicker = React.createClass({
 	}
 });
 
+var BuildNamer = React.createClass({
+	getInitialState: function(){
+		return {value: this.props.defaultName};
+	},
+	handleNameChange: function(e){
+		var newName = e.target.value;
+
+		this.props.handleNameChange(newName);
+
+		this.setState({value: newName});
+	},
+	render: function(){
+		return (
+			<div className="BuilderNamer">
+					<div className="builderNamerTitle">Character Name</div>
+					<div className="nameInput">
+						<input
+						type="text"
+						onChange={this.handleNameChange}
+						value={this.state.value} />
+					</div>
+					<div className="builderNamerTitle">Other players will see:</div>
+					<div className="filteredName">{this.props.getFilteredName(this.state.value)}</div>
+			</div>
+		);
+	}
+});
+
 var StatsSection = React.createClass({
 	render: function(){
 		var buildStats = [];
@@ -76,7 +104,6 @@ var AttributeRow = React.createClass({
 				<span>
 					<input 
 					type="number"
-					ref="attributeInput"
 					onChange={this.handleChange}
 					value={this.state.value} />
 				</span>
@@ -139,6 +166,13 @@ var UnkindlerApp = React.createClass({
 			characterBuild: this.state.characterBuild
 		});
 	},
+	handleNameChange: function(newName){		
+		this.state.characterBuild.setCharacterName(newName);
+		
+		this.setState({
+			characterBuild: this.state.characterBuild
+		});
+	},
 	render: function(){
 		var characterBuild = this.state.characterBuild;
 
@@ -150,6 +184,11 @@ var UnkindlerApp = React.createClass({
 				<div className="appBody">
 
 					<div className="buildSection">
+						<BuildNamer 
+						defaultName={characterBuild.getCharacterName()}
+						getFilteredName={this.props.nameFilter.getFilteredName}
+						handleNameChange={this.handleNameChange} />
+
 						<StatsSection 
 						title="Level" 
 						buildStats={characterBuild.getBuildStatsByCategory('level')} />
@@ -196,6 +235,7 @@ ReactDOM.render(
 	<UnkindlerApp 
 		initialCharacterBuild={characterBuild}
 		classes={CharacterClasses} 
-		stats={CharacterStats} />,
+		stats={CharacterStats}
+		nameFilter={NameFilter} />,
 	document.getElementById('unkindlerHook')
 );
