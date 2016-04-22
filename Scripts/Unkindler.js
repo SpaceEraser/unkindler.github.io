@@ -5,14 +5,6 @@
 //						stats = (calculated) a thing about the character affected by attributes (HP, FP, etc.)
 //											
 // ------------------------------------------------------------
-CharacterAttribute = function(){
-	this.id = -1;
-	this.title = title;
-	this.description = description;
-	this.min = min;
-	this.max = max;
-	this.value = value;
-}
 
 CharacterStat = function(title,category,description,valueCalcFunc){
 	this.id = -1;
@@ -57,7 +49,7 @@ CharacterStats.addStat(new CharacterStat(
 	'base',
 	'The amount of health your character has.',
 	function(character){
-		switch(character.getAttributeValue('vigor')){
+		switch(character.getCharacterAttributeTotal('Vigor')){
 			default: return 403; //10
 			case 11: return 427;
 			case 12: return 454;
@@ -157,7 +149,7 @@ CharacterStats.addStat(new CharacterStat(
 	'base',
 	'What penalties your character has depending on your equip load %.',
 	function(character){
-		return character.getAttributeValue('vitality') + 40;
+		return character.getCharacterAttributeTotal('Vitality') + 40;
 	}
 ));
 
@@ -166,7 +158,7 @@ CharacterStats.addStat(new CharacterStat(
 	'base',
 	'How many spell slots you can attune at bonfires',
 	function(character){
-		var atn = character.getAttributeValue('attunement');
+		var atn = character.getCharacterAttributeTotal('Attunement');
 
 		if(atn >= 99) return 10;
 		if(atn >= 80) return 9;
@@ -187,7 +179,7 @@ CharacterStats.addStat(new CharacterStat(
 	'base',
 	'How many focus points you will have.',
 	function(character){
-		switch(character.getAttributeValue('attunement')){
+		switch(character.getCharacterAttributeTotal('Attunement')){
 			default: return 72;//case 6
 			case 7: return 77;
 			case 8: return 82;
@@ -293,9 +285,9 @@ CharacterStats.addStat(new CharacterStat(
 	function(character){
 		var soulLevel = character.characterClass.baseLevel;
 
-		for(var p in character.attributeInvestments){
-			soulLevel += character.attributeInvestments[p];
-		}
+		character.investedAttributes.getInOrder().forEach(function(attribute,i){
+			soulLevel += attribute.value;
+		});
 
 		return soulLevel;
 	}
@@ -305,16 +297,30 @@ CharacterStats.addStat(new CharacterStat(
 // 					Character base classes
 // ------------------------------------------------------------
 
-CharacterAttributeSet = function(vigor,attunement,endurance,vitality,strength,dexterity,intelligence,faith,luck){
-	this.vigor			= vigor;
-	this.attunement		= attunement;
-	this.endurance		= endurance;
-	this.vitality		= vitality;
-	this.strength		= strength;
-	this.dexterity		= dexterity;
-	this.intelligence	= intelligence;
-	this.faith			= faith;
-	this.luck			= luck;
+CharacterAttributeSet = function(Vigor,Attunement,Endurance,Vitality,Strength,Dexterity,Intelligence,Faith,Luck){
+	this.Vigor			= Vigor;
+	this.Attunement		= Attunement;
+	this.Endurance		= Endurance;
+	this.Vitality		= Vitality;
+	this.Strength		= Strength;
+	this.Dexterity		= Dexterity;
+	this.Intelligence	= Intelligence;
+	this.Faith			= Faith;
+	this.Luck			= Luck;
+}
+
+CharacterAttributeSet.prototype.getInOrder = function(){
+	return [
+		{title:'Vigor',value:this.Vigor},
+		{title:'Attunement',value:this.Attunement},
+		{title:'Endurance',value:this.Endurance},
+		{title:'Vitality',value:this.Vitality},
+		{title:'Strength',value:this.Strength},
+		{title:'Dexterity',value:this.Dexterity},
+		{title:'Intelligence',value:this.Intelligence},
+		{title:'Faith',value:this.Faith},
+		{title:'Luck',value:this.Luck}
+	];
 }
 
 CharacterClass = function(title,baseLevel,baseAttributes){
@@ -373,7 +379,7 @@ CharacterBuildStat = function(stat,value){
 CharacterBuild = function(characterClass){
 	this.title = 'Untitled';
 	this.characterClass = characterClass || CharacterClasses.getCharacterClass('Deprived');
-	this.attributeInvestments = new CharacterAttributeSet(0,0,0,0,0,0,0,0,0);
+	this.investedAttributes = new CharacterAttributeSet(0,0,0,0,0,0,0,0,0);
 }
 
 CharacterBuild.prototype.getBuildStatsByCategory = function(category){
@@ -392,8 +398,12 @@ CharacterBuild.prototype.getLevel = function(){
 	return this.characterClass.baseLevel + this.investedLevels;
 }
 
-CharacterBuild.prototype.getAttributeValue = function(attribute){
-	return this.characterClass.baseAttributes[attribute] + this.attributeInvestments[attribute];
+CharacterBuild.prototype.getCharacterAttributeTotal = function(attribute){
+	return this.characterClass.baseAttributes[attribute] + this.investedAttributes[attribute];
+}
+
+CharacterBuild.prototype.setCharacterAttributeInvested = function(attribute,n){
+	this.investedAttributes[attribute] = n;
 }
 
 CharacterBuild.prototype.setCharacterClass = function(characterClass){
