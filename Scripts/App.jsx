@@ -40,6 +40,7 @@ var BuildNamer = React.createClass({
 					<div className="nameInput">
 						<input
 						type="text"
+						max="16"
 						onChange={this.handleNameChange}
 						value={this.state.value} />
 					</div>
