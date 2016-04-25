@@ -155,7 +155,7 @@ CharacterClass = function(title,baseAttributes){
 	this.title = title;
 	this.baseAttributes = baseAttributes;
 
-	this.baseLevel = -89;
+	this.baseLevel = -89;//10 base stats * 9 attributes - 1 starting level
 
 	for(var p in baseAttributes){
 		this.baseLevel += baseAttributes[p];
