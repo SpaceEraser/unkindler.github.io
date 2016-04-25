@@ -32,11 +32,11 @@ CharacterStats = function(){
 var HP_BY_VIGOR = [403,403,403,403,403,403,403,403,403,403,427,454,483,515,550,594,638,681,723,764,804,842,879,914,947,977,1000,1019,1038,1056,1074,1092,1109,1125,1141,1157,1172,1186,1200,1213,1226,1238,1249,1260,1269,1278,1285,1292,1297,1300,1302,1304,1307,1309,1312,1314,1316,1319,1321,1323,1326,1328,1330,1333,1335,1337,1340,1342,1344,1346,1348,1351,1353,1355,1357,1359,1361,1363,1365,1367,1369,1371,1373,1375,1377,1379,1381,1383,1385,1386,1388,1390,1391,1393,1395,1396,1397,1399,1400];
 
 CharacterStats.addStat(new CharacterStat('healthPoints','Health Points (Unembered)','(Vigor)',function(characterBuild){
-	return HP_BY_VIGOR[characterBuild.getAttributeTotal('Vigor')];
+	return HP_BY_VIGOR[characterBuild.getAttributeTotal('Vigor')-1];
 }));
 
 CharacterStats.addStat(new CharacterStat('emberedHealthPoints','Health Points (Embered)','(Vigor)',function(characterBuild){
-	return Math.round(HP_BY_VIGOR[characterBuild.getAttributeTotal('Vigor')] * 1.3);
+	return Math.round(HP_BY_VIGOR[characterBuild.getAttributeTotal('Vigor')-1] * 1.3);
 }));
 
 CharacterStats.addStat(new CharacterStat('equipMax','Equip Load Max','(Vitality)',function(characterBuild){
@@ -63,7 +63,7 @@ CharacterStats.addStat(new CharacterStat('attunementSlots','Attunement Slots','(
 var FP_BY_ATTUNEMENT = [50,53,58,62,67,72,77,82,87,93,98,103,109,114,120,124,130,136,143,150,157,165,173,181,189,198,206,215,224,233,242,251,260,270,280,283,286,289,293,296,299,302,305,309,312,315,318,320,323,326,329,332,334,337,339,342,344,346,348,350,352,355,358,361,364,366,369,372,375,377,380,383,385,388,391,394,396,399,402,404,407,409,412,415,417,420,422,425,427,430,432,434,437,439,441,444,446,448,450];
 
 CharacterStats.addStat(new CharacterStat('focusPoints','Focus Points','(Attunement)',function(characterBuild){
-	return FP_BY_ATTUNEMENT[characterBuild.getAttributeTotal('Attunement')];
+	return FP_BY_ATTUNEMENT[characterBuild.getAttributeTotal('Attunement')-1];
 }));
 
 CharacterStats.addStat(new CharacterStat('soulLevel','Soul Level','(All Attributes)',function(characterBuild){
@@ -131,7 +131,7 @@ CharacterStats.addStat(new CharacterStat('curseResistance','Curse Resistance','(
 var FROSTDEF_BY_VIGOR = [91,91,92,92,92,92,92,93,93,93,93,93,94,94,94,94,94,95,95,95,95,95,96,96,96,96,96,97,97,97,100,103,107,110,113,116,119,123,126,129,130,130,131,132,132,133,134,135,135,136,137,137,138,139,139,140,141,142,142,143,143,144,144,145,145,146,146,147,147,148,148,148,149,149,150,150,151,151,152,152,153,153,154,154,154,155,155,156,156,157,157,158,158,159,159,159,160,160,161];
 
 CharacterStats.addStat(new CharacterStat('frostResistance','Frost Resistance','(Vigor)',function(characterBuild){
-	return FROSTDEF_BY_VIGOR[characterBuild.getAttributeTotal('Vigor')];
+	return FROSTDEF_BY_VIGOR[characterBuild.getAttributeTotal('Vigor')-1];
 }));
 
 // ------------------------------------------------------------
