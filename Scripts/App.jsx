@@ -242,7 +242,7 @@ var UnkindlerApp = React.createClass({
 	}	
 });
 
-var characterBuild = new CharacterBuild(CharacterClasses.getCharacterClassByName('Knight'));
+var characterBuild = new CharacterBuild();
 
 ReactDOM.render(
 	<UnkindlerApp 

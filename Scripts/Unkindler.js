@@ -150,8 +150,8 @@ CharacterAttributeSet = function(Vigor,Attunement,Endurance,Vitality,Strength,De
 	this.Luck			= Luck;
 }
 
-CharacterClass = function(title,baseAttributes){
-	this.id = -1;
+CharacterClass = function(id,title,baseAttributes){
+	this.id = id;
 	this.title = title;
 	this.baseAttributes = baseAttributes;
 
@@ -188,24 +188,24 @@ CharacterClasses = function(){
 	};
 }();
 
-CharacterClasses.addCharacterClass(new CharacterClass(    'Knight', new CharacterAttributeSet( 12, 10, 11, 15, 13, 12,  9,  9,  7)));
-CharacterClasses.addCharacterClass(new CharacterClass( 'Mercenary', new CharacterAttributeSet( 11, 12, 11, 10, 10, 16, 10,  8,  9)));
-CharacterClasses.addCharacterClass(new CharacterClass(   'Warrior', new CharacterAttributeSet( 14,  6, 12, 11, 16,  9,  8,  9, 11)));
-CharacterClasses.addCharacterClass(new CharacterClass(    'Herald', new CharacterAttributeSet( 12, 10,  9, 12, 12, 11,  8, 13, 11)));
-CharacterClasses.addCharacterClass(new CharacterClass(     'Thief', new CharacterAttributeSet( 10, 11, 10,  9,  9, 13, 10,  8, 14)));
-CharacterClasses.addCharacterClass(new CharacterClass(  'Assassin', new CharacterAttributeSet( 10, 14, 11, 10, 10, 14, 11,  9, 10)));
-CharacterClasses.addCharacterClass(new CharacterClass(  'Sorcerer', new CharacterAttributeSet(  9, 16,  9,  7,  7, 12, 16,  7, 12)));
-CharacterClasses.addCharacterClass(new CharacterClass('Pyromancer', new CharacterAttributeSet( 11, 12, 10,  8, 12,  9, 14, 14,  7)));
-CharacterClasses.addCharacterClass(new CharacterClass(    'Cleric', new CharacterAttributeSet( 10, 14,  9,  7, 12,  8,  7, 16, 13)));
-CharacterClasses.addCharacterClass(new CharacterClass(  'Deprived', new CharacterAttributeSet( 10, 10, 10, 10, 10, 10, 10, 10, 10)));
+CharacterClasses.addCharacterClass(new CharacterClass(0,    'Knight', new CharacterAttributeSet( 12, 10, 11, 15, 13, 12,  9,  9,  7)));
+CharacterClasses.addCharacterClass(new CharacterClass(1, 'Mercenary', new CharacterAttributeSet( 11, 12, 11, 10, 10, 16, 10,  8,  9)));
+CharacterClasses.addCharacterClass(new CharacterClass(2,   'Warrior', new CharacterAttributeSet( 14,  6, 12, 11, 16,  9,  8,  9, 11)));
+CharacterClasses.addCharacterClass(new CharacterClass(3,    'Herald', new CharacterAttributeSet( 12, 10,  9, 12, 12, 11,  8, 13, 11)));
+CharacterClasses.addCharacterClass(new CharacterClass(4,     'Thief', new CharacterAttributeSet( 10, 11, 10,  9,  9, 13, 10,  8, 14)));
+CharacterClasses.addCharacterClass(new CharacterClass(5,  'Assassin', new CharacterAttributeSet( 10, 14, 11, 10, 10, 14, 11,  9, 10)));
+CharacterClasses.addCharacterClass(new CharacterClass(6,  'Sorcerer', new CharacterAttributeSet(  9, 16,  9,  7,  7, 12, 16,  7, 12)));
+CharacterClasses.addCharacterClass(new CharacterClass(7,'Pyromancer', new CharacterAttributeSet( 11, 12, 10,  8, 12,  9, 14, 14,  7)));
+CharacterClasses.addCharacterClass(new CharacterClass(8,    'Cleric', new CharacterAttributeSet( 10, 14,  9,  7, 12,  8,  7, 16, 13)));
+CharacterClasses.addCharacterClass(new CharacterClass(9,  'Deprived', new CharacterAttributeSet( 10, 10, 10, 10, 10, 10, 10, 10, 10)));
 
 // ------------------------------------------------------------
 //					The user's character build
 // ------------------------------------------------------------
-CharacterBuild = function(characterClass){
-	this.title = 'Untitled';
-	this.characterClass = characterClass || CharacterClasses.getCharacterClass('Deprived');
-	this.investedAttributes = new CharacterAttributeSet(0,0,0,0,0,0,0,0,0);
+CharacterBuild = function(name,characterClass,attributeSet){
+	this.title = name || 'Untitled';
+	this.characterClass = characterClass || CharacterClasses.getCharacterClassById(0);
+	this.investedAttributes = attributeSet || new CharacterAttributeSet(0,0,0,0,0,0,0,0,0);
 }
 
 CharacterBuild.prototype.getLevel = function(){
@@ -246,6 +246,58 @@ NameFilter = function(){
 			return str.replace(_censorRegex,function(str){
 				return Array(str.length+1).join('*');
 			});
+		}
+	};
+}();
+
+//      digit 1 = version
+// digit      2 = class id
+// digits  3-21 = stats
+// digit     22 = divider
+// digits    23+ = character name
+
+//?b=0210101010101010101010|Fish%20Stick
+//Translates to:
+//Version 0
+//Class id #2
+// stats all 10
+// character name Fish Stick
+
+var BuildSerializer = function(){
+	var _versionImporter = {
+		'0': function(buildString){
+			var characterClassId = buildString.substr(1,1);
+
+			var characterClass = CharacterClasses.getCharacterClassById(characterClassId);
+
+			var attributeSet = new CharacterAttributeSet(
+				Number(buildString.substr(2,2)),
+				Number(buildString.substr(4,2)),
+				Number(buildString.substr(6,2)),
+				Number(buildString.substr(8,2)),
+				Number(buildString.substr(10,2)),
+				Number(buildString.substr(12,2)),
+				Number(buildString.substr(14,2)),
+				Number(buildString.substr(16,2)),
+				Number(buildString.substr(18,2))
+			);
+
+			var characterName = buildString.substr(buildString.indexOf('|')+1);
+
+			var characterBuild = new CharacterBuild(characterName,characterClass,attributeSet);
+
+			return characterBuild;
+		}
+	};
+
+	return {
+		export: function(characterBuild){
+
+		},
+		import: function(buildString){
+			var version = buildString.substr(0,1);
+
+			return _versionImporter[version]();
 		}
 	};
 }();
