@@ -150,11 +150,16 @@ CharacterAttributeSet = function(Vigor,Attunement,Endurance,Vitality,Strength,De
 	this.Luck			= Luck;
 }
 
-CharacterClass = function(title,baseLevel,baseAttributes){
+CharacterClass = function(title,baseAttributes){
 	this.id = -1;
 	this.title = title;
-	this.baseLevel = baseLevel;
 	this.baseAttributes = baseAttributes;
+
+	this.baseLevel = -89;
+
+	for(var p in baseAttributes){
+		this.baseLevel += baseAttributes[p];
+	}
 }
 
 CharacterClasses = function(){
@@ -183,16 +188,16 @@ CharacterClasses = function(){
 	};
 }();
 
-CharacterClasses.addCharacterClass(new CharacterClass(    'Knight',  9, new CharacterAttributeSet( 12, 10, 11, 15, 13, 12,  9,  9,  7)));
-CharacterClasses.addCharacterClass(new CharacterClass( 'Mercenary',  8, new CharacterAttributeSet( 11, 12, 11, 10, 10, 16, 10,  8,  9)));
-CharacterClasses.addCharacterClass(new CharacterClass(   'Warrior',  7, new CharacterAttributeSet( 14,  6, 12, 11, 16,  9,  8,  9, 11)));
-CharacterClasses.addCharacterClass(new CharacterClass(    'Herald',  9, new CharacterAttributeSet( 12, 10,  9, 12, 12, 11,  8, 13, 11)));
-CharacterClasses.addCharacterClass(new CharacterClass(     'Thief',  5, new CharacterAttributeSet( 10, 11, 10,  9,  9, 13, 10,  8, 14)));
-CharacterClasses.addCharacterClass(new CharacterClass(  'Assassin', 10, new CharacterAttributeSet( 10, 14, 11, 10, 10, 14, 11,  9, 10)));
-CharacterClasses.addCharacterClass(new CharacterClass(  'Sorcerer',  6, new CharacterAttributeSet(  9, 16,  9,  7,  7, 12, 16,  7, 12)));
-CharacterClasses.addCharacterClass(new CharacterClass('Pyromancer',  8, new CharacterAttributeSet( 11, 12, 10,  8, 12,  9, 14, 14,  7)));
-CharacterClasses.addCharacterClass(new CharacterClass(    'Cleric',  7, new CharacterAttributeSet( 10, 14,  9,  7, 12,  8,  7, 16, 13)));
-CharacterClasses.addCharacterClass(new CharacterClass(  'Deprived',  1, new CharacterAttributeSet( 10, 10, 10, 10, 10, 10, 10, 10, 10)));
+CharacterClasses.addCharacterClass(new CharacterClass(    'Knight', new CharacterAttributeSet( 12, 10, 11, 15, 13, 12,  9,  9,  7)));
+CharacterClasses.addCharacterClass(new CharacterClass( 'Mercenary', new CharacterAttributeSet( 11, 12, 11, 10, 10, 16, 10,  8,  9)));
+CharacterClasses.addCharacterClass(new CharacterClass(   'Warrior', new CharacterAttributeSet( 14,  6, 12, 11, 16,  9,  8,  9, 11)));
+CharacterClasses.addCharacterClass(new CharacterClass(    'Herald', new CharacterAttributeSet( 12, 10,  9, 12, 12, 11,  8, 13, 11)));
+CharacterClasses.addCharacterClass(new CharacterClass(     'Thief', new CharacterAttributeSet( 10, 11, 10,  9,  9, 13, 10,  8, 14)));
+CharacterClasses.addCharacterClass(new CharacterClass(  'Assassin', new CharacterAttributeSet( 10, 14, 11, 10, 10, 14, 11,  9, 10)));
+CharacterClasses.addCharacterClass(new CharacterClass(  'Sorcerer', new CharacterAttributeSet(  9, 16,  9,  7,  7, 12, 16,  7, 12)));
+CharacterClasses.addCharacterClass(new CharacterClass('Pyromancer', new CharacterAttributeSet( 11, 12, 10,  8, 12,  9, 14, 14,  7)));
+CharacterClasses.addCharacterClass(new CharacterClass(    'Cleric', new CharacterAttributeSet( 10, 14,  9,  7, 12,  8,  7, 16, 13)));
+CharacterClasses.addCharacterClass(new CharacterClass(  'Deprived', new CharacterAttributeSet( 10, 10, 10, 10, 10, 10, 10, 10, 10)));
 
 // ------------------------------------------------------------
 //					The user's character build
