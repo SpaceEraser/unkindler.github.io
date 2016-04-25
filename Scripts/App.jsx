@@ -55,15 +55,13 @@ var StatsSection = React.createClass({
 	render: function(){
 		var buildStats = [];
 
-		if(this.props.buildStats){
-			this.props.buildStats.forEach(function(buildStat,i){
-				buildStats.push(
-					<div key={buildStat.stat.id}>
-						{buildStat.stat.title} - {buildStat.value}
-					</div>
-				);
-			});
-		}
+		this.props.buildStats.forEach(function(buildStat,i){
+			buildStats.push(
+				<div key={buildStat.stat.internalName}>
+					{buildStat.stat.title} - {buildStat.value}
+				</div>
+			);
+		});
 
 		return(
 			<div className="buildStatsSection">
@@ -117,21 +115,22 @@ var AttributeRow = React.createClass({
 
 var AttributesSection = React.createClass({
 	render: function(){
-		var attributes = [];
+		var attributeRows = [];
 
-		var baseAttributes = this.props.characterBuild.characterClass.baseAttributes.getInOrder();
-		var investedAttributes = this.props.characterBuild.investedAttributes.getInOrder();
+		var attributes = ['Vigor','Attunement','Endurance','Vitality','Strength','Dexterity','Intelligence','Faith','Luck'];
 
-		for(var i=0;i<baseAttributes.length;i++){
-			var baseAttribute = baseAttributes[i];
-			var investedAttribute = investedAttributes[i];
+		var baseAttributes = this.props.characterBuild.characterClass.baseAttributes;
+		var investedAttributes = this.props.characterBuild.investedAttributes;
 
-			attributes.push(
+		for(var i=0;i<attributes.length;i++){
+			var baseAttribute = attributes[i];
+
+			attributeRows.push(
 				<AttributeRow 
-				key={baseAttribute.title} 
-				attribute={baseAttribute.title}
-				baseValue={baseAttribute.value} 
-				investedValue={investedAttribute.value}
+				key={baseAttribute} 
+				attribute={baseAttribute}
+				baseValue={baseAttributes[baseAttribute]}
+				investedValue={investedAttributes[baseAttribute]}
 				handleCharacterAttributeChange={this.props.handleCharacterAttributeChange} />			
 			);
 		}
@@ -139,7 +138,7 @@ var AttributesSection = React.createClass({
 		return (
 			<div className="attributesSection">
 				<div className="attributesSectionHeader">Attributes</div>
-				{attributes}
+				{attributeRows}
 			</div>
 		);
 	}
@@ -174,6 +173,22 @@ var UnkindlerApp = React.createClass({
 			characterBuild: this.state.characterBuild
 		});
 	},
+	getBuildStats:function(statInternalNamesArr){
+			var stats = this.props.stats;
+			var characterBuild = this.state.characterBuild;
+			var buildStats = [];
+
+			statInternalNamesArr.forEach(function(statInternalName,i){
+				var stat = stats.getStat(statInternalName);
+
+				buildStats.push({
+					stat: stat,
+					value: stat.getValueFor(characterBuild)
+				});
+			});
+
+			return buildStats;
+	},
 	render: function(){
 		var characterBuild = this.state.characterBuild;
 
@@ -191,38 +206,41 @@ var UnkindlerApp = React.createClass({
 						handleNameChange={this.handleNameChange} />
 
 						<StatsSection 
-						title="Level" 
-						buildStats={characterBuild.getBuildStatsByCategory('level')} />
+						title="Soul Level" 
+						buildStats={this.getBuildStats(['soulLevel'])} />
 
 						<ClassPicker 
-							classes={this.props.classes.getCharacterClasses()}
-							characterClass={characterBuild.characterClass}
-							handleCharacterClassChange={this.handleCharacterClassChange} />
+						classes={this.props.classes.getCharacterClasses()}
+						characterClass={characterBuild.characterClass}
+						handleCharacterClassChange={this.handleCharacterClassChange} />
 
 						<AttributesSection 
 						characterBuild={characterBuild}
 						handleCharacterAttributeChange={this.handleCharacterAttributeChange} />
-					
 					</div>
 
 					<div className="buildSection">
 						<StatsSection 
 						title="Base Stats" 
-						buildStats={characterBuild.getBuildStatsByCategory('base')} />
+						buildStats={this.getBuildStats(['healthPoints','emberedHealthPoints','equipMax','attunementSlots','focusPoints','stamina','castingSpeed'])} />
 
 						<StatsSection 
-						title="Attack"      
-						buildStats={characterBuild.getBuildStatsByCategory('attack')} />
+						title="Attack" 
+						buildStats={this.getBuildStats([])} />
 					</div>
 
 					<div className="buildSection">
 						<StatsSection 
-						title="Defense"    
-						buildStats={characterBuild.getBuildStatsByCategory('defense')} />
+						title="Defense"       
+						buildStats={this.getBuildStats(['physicalDefense','physicalDefenseStrike','physicalDefenseSlash','physicalDefenseThrust'])} />
 
 						<StatsSection 
-						title="Resistances" 
-						buildStats={characterBuild.getBuildStatsByCategory('resistances')} />
+						title="Eemental Defense"     
+						buildStats={this.getBuildStats(['magicDefense','fireDefense','lightningDefense','darkDefense'])}/>
+
+						<StatsSection 
+						title="Resistance"     
+						buildStats={this.getBuildStats(['bleedResistance','poisonResistance','curseResistance'])}/>
 					</div>
 				</div>
 			</div>
