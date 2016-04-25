@@ -77,7 +77,7 @@ var AttributeRow = React.createClass({
 		return {value: this.props.investedValue};
 	},
 	handleChange: function(e){
-		var newValue = Number(e.target.value);
+		var newValue = Number(e.target.value) - this.props.baseValue;
 
 		if(newValue < 0){
 			newValue = 0;
@@ -104,10 +104,8 @@ var AttributeRow = React.createClass({
 					<input 
 					type="number"
 					onChange={this.handleChange}
-					value={this.state.value} />
+					value={this.props.baseValue + Number(this.state.value)} />
 				</span>
-
-				<span className="attributeTotalValue">{this.props.baseValue + Number(this.state.value)}</span>
 			</div>
 		);
 	}
@@ -223,10 +221,6 @@ var UnkindlerApp = React.createClass({
 						<StatsSection 
 						title="Base Stats" 
 						buildStats={this.getBuildStats(['healthPoints','emberedHealthPoints','equipMax','attunementSlots','focusPoints','stamina','castingSpeed'])} />
-
-						<StatsSection 
-						title="Attack" 
-						buildStats={this.getBuildStats([])} />
 					</div>
 
 					<div className="buildSection">
