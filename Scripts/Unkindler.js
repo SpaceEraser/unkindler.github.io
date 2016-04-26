@@ -37,20 +37,24 @@ StatsIncreases = function(csvStr){
 
 //convert to nested object
 	var statIncreases = {};
+
 	allLines.forEach(function(line){
 		var investment = line[0];
-
-		var statIncrease = {};
 
 		for(var i=1;i<line.length;i++){
 			var header = headers[i];
 			var attributeName = header[0];
 			var stat = header[header.length-1];
 			var statValue = Number(line[i]);
-			var attributeStats = statIncrease[attributeName];
+
+			if(!statIncreases[attributeName]){
+				statIncreases[attributeName] = {};
+			}
+
+			var attributeStats = statIncreases[attributeName][investment];
 
 			if(!attributeStats){
-				attributeStats = statIncrease[attributeName] = {};
+				attributeStats = statIncreases[attributeName][investment] = {};
 			}
 
 			if(stat == 'all'){
@@ -76,13 +80,13 @@ StatsIncreases = function(csvStr){
 			else{
 				attributeStats[stat] = statValue;
 			}
-		}
 
-		if(!statIncreases[attributeName]){
-			statIncreases[attributeName] = [];
-		}
+			if(!statIncreases[attributeName]){
+				statIncreases[attributeName] = {};
+			}
 
-		statIncreases[attributeName][investment] = attributeStats;
+			statIncreases[attributeName][investment] = attributeStats;
+		}
 	});
 
 	return {
@@ -98,12 +102,13 @@ StatsIncreases = function(csvStr){
 				if(statIncrease){
 					var statIncreaseRow = statIncrease[attrValue];
 
-					for(var stat in statIncreaseRow){
-
-						statSet[stat] += statIncreaseRow[stat];
+					for(var stat in statSet){
+						var increaseAmount = statIncreaseRow[stat];
+						if(increaseAmount){
+							statSet[stat] += statIncreaseRow[stat];
+						}
 					}
 				}
-
 			}
 
 			return statSet;
@@ -185,8 +190,14 @@ CharacterBuild = function(name,characterClass,attributeSet){
 	this.investedAttributes = attributeSet || new CharacterAttributeSet(0,0,0,0,0,0,0,0,0);
 }
 
-CharacterBuild.prototype.getLevel = function(){
-	return this.characterClass.baseLevel + this.investedLevels;
+CharacterBuild.prototype.getSoulLevel = function(){
+	var soulLevel = this.characterClass.baseLevel;
+
+	for(var attribute in this.investedAttributes){
+		soulLevel += this.investedAttributes[attribute];
+	}
+
+	return soulLevel;
 }
 
 CharacterBuild.prototype.getAttributeTotal = function(attribute){
@@ -196,8 +207,8 @@ CharacterBuild.prototype.getAttributeTotal = function(attribute){
 CharacterBuild.prototype.getAttributeTotalSet = function(){
 	var attributeTotalSet = {};
 
-	for(var attribute in this.investedAttributes){
-		attributeTotalSet[attribute] = this.characterClass.baseAttributes[attribute] + this.investedAttributes[attribute];
+	for(var attrName in this.investedAttributes){
+		attributeTotalSet[attrName] = this.characterClass.baseAttributes[attrName] + this.investedAttributes[attrName];
 	}
 
 	return attributeTotalSet;

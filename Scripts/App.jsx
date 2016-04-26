@@ -53,12 +53,10 @@ var BuildNamer = React.createClass({
 
 var StatsSection = React.createClass({
 	render: function(){
-		var buildStats = [];
-
-		this.props.buildStats.forEach(function(buildStat,i){
-			buildStats.push(
-				<div key={buildStat.stat.internalName}>
-					{buildStat.stat.title} - {buildStat.value}
+		var buildStats = this.props.buildStats.map(function(buildStat,i){
+			return(
+				<div key={buildStat.title}>
+					{buildStat.title} - {buildStat.value}
 				</div>
 			);
 		});
@@ -88,7 +86,7 @@ var AttributeRow = React.createClass({
 
 		//only bubble if the value has changed
 		if(newValue != this.state.value){
-			this.props.handleCharacterAttributeChange(this.props.attribute,Number(newValue));
+			this.props.handleCharacterAttributeChange(this.props.attribute.toLowerCase(),Number(newValue));
 		}
 
 		this.setState({value: newValue});
@@ -145,24 +143,31 @@ var AttributesSection = React.createClass({
 
 var UnkindlerApp = React.createClass({
 	getInitialState: function(){
+		var characterBuild = this.props.initialCharacterBuild;
 		return {
-			characterBuild: this.props.initialCharacterBuild
+			characterBuild: characterBuild,
+			characterStats: this.props.stats.getStatSet(characterBuild.getAttributeTotalSet())
 		};
 	},
 	handleCharacterAttributeChange: function(attribute,newValue){
-		this.state.characterBuild.setCharacterAttributeInvested(attribute,newValue);
+		var characterBuild = this.state.characterBuild;
+
+		characterBuild.setCharacterAttributeInvested(attribute,newValue);
 
 		this.setState({
-			characterBuild: this.state.characterBuild
+			characterBuild: characterBuild,
+			characterStats: this.props.stats.getStatSet(characterBuild.getAttributeTotalSet())
 		});
 	},
 	handleCharacterClassChange: function(newClassId){
 		var newCharacterClass = this.props.classes.getCharacterClassById(newClassId);
-		
-		this.state.characterBuild.setCharacterClass(newCharacterClass);
+		var characterBuild = this.state.characterBuild;
+
+		characterBuild.setCharacterClass(newCharacterClass);
 		
 		this.setState({
-			characterBuild: this.state.characterBuild
+			characterBuild: characterBuild,
+			characterStats: this.props.stats.getStatSet(characterBuild.getAttributeTotalSet())
 		});
 	},
 	handleNameChange: function(newName){		
@@ -171,22 +176,6 @@ var UnkindlerApp = React.createClass({
 		this.setState({
 			characterBuild: this.state.characterBuild
 		});
-	},
-	getBuildStats:function(statInternalNamesArr){
-			var stats = this.props.stats;
-			var characterBuild = this.state.characterBuild;
-			var buildStats = [];
-
-			statInternalNamesArr.forEach(function(statInternalName,i){
-				var stat = stats.getStat(statInternalName);
-
-				buildStats.push({
-					stat: stat,
-					value: stat.getValueFor(characterBuild)
-				});
-			});
-
-			return buildStats;
 	},
 	render: function(){
 		var characterBuild = this.state.characterBuild;
@@ -206,7 +195,9 @@ var UnkindlerApp = React.createClass({
 
 						<StatsSection 
 						title="Soul Level" 
-						buildStats={this.getBuildStats(['soulLevel'])} />
+						buildStats={[
+							{title: 'Soul Level', value: characterBuild.getSoulLevel()}
+						]} />
 
 						<ClassPicker 
 						classes={this.props.classes.getCharacterClasses()}
@@ -221,21 +212,45 @@ var UnkindlerApp = React.createClass({
 					<div className="buildSection">
 						<StatsSection 
 						title="Base Stats" 
-						buildStats={this.getBuildStats(['healthPoints','emberedHealthPoints','equipMax','attunementSlots','focusPoints','stamina','castingSpeed'])} />
+						buildStats={[
+							{title: 'Health Ponts', value: this.state.characterStats.hp},
+							{title: 'Embered HP', value: Math.round(this.state.characterStats.hp*1.3)},
+							{title: 'Equip Load Max', value: this.state.characterStats.equipMax},
+							{title: 'Attunement Slots', value: this.state.characterStats.attunementSlots},
+							{title: 'Focus Points', value: this.state.characterStats.fp},
+							{title: 'Stamina', value: this.state.characterStats.stamina},
+							{title: 'Casting Speed', value: this.state.characterStats.castingSpeed},
+						]}/>
+
 					</div>
 
 					<div className="buildSection">
 						<StatsSection 
 						title="Defense"       
-						buildStats={this.getBuildStats(['physicalDefense','physicalDefenseStrike','physicalDefenseSlash','physicalDefenseThrust'])} />
+						buildStats={[
+							{title: 'Physical',value: this.state.characterStats.defense_physical},
+							{title: 'VS Strike',value: this.state.characterStats.defense_strike},
+							{title: 'VS Slash',value: this.state.characterStats.defense_slash},
+							{title: 'VS Thrust',value: this.state.characterStats.defense_thrust}
+						]}/>
 
 						<StatsSection 
-						title="Eemental Defense"     
-						buildStats={this.getBuildStats(['magicDefense','fireDefense','lightningDefense','darkDefense'])}/>
+						title="Elemental Defense"           
+						buildStats={[
+							{title: 'Magic',value: this.state.characterStats.defense_magic},
+							{title: 'Fire',value: this.state.characterStats.defense_fire},
+							{title: 'Lightning',value: this.state.characterStats.defense_lightning},
+							{title: 'Dark',value: this.state.characterStats.defense_dark}
+						]}/>
 
 						<StatsSection 
-						title="Resistance"     
-						buildStats={this.getBuildStats(['bleedResistance','poisonResistance','curseResistance'])}/>
+						title="Resistance"             
+						buildStats={[
+							{title: 'Bleed',value: this.state.characterStats.resistance_bleed},
+							{title: 'Poison',value: this.state.characterStats.resistance_poison},
+							{title: 'Curse',value: this.state.characterStats.resistance_curse},
+							{title: 'Frost',value: this.state.characterStats.resistance_frost}
+						]}/>   
 					</div>
 				</div>
 			</div>
@@ -250,21 +265,13 @@ $.ajax({
     success: function(csvStr) {
     	var statsIncreases = new StatsIncreases(csvStr);
 
-		var characterBuild = new CharacterBuild(
-			'Untitled',
-			CharacterClasses.getCharacterClassById(0),
-			new CharacterAttributeSet(75,2,4,5,0,0,0,0,0)
-		);
+		var characterBuild = new CharacterBuild();
 
-		console.log(statsIncreases.getStatSet(characterBuild.getAttributeTotalSet()));
-
-
-return;
 		ReactDOM.render(
 			<UnkindlerApp 
 				initialCharacterBuild={characterBuild}
 				classes={CharacterClasses} 
-				stats={CharacterStats}
+				stats={statsIncreases}
 				nameFilter={NameFilter} />,
 			document.getElementById('unkindlerHook')
 		);
