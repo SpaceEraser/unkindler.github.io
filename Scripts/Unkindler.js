@@ -1,153 +1,130 @@
+//-------------------------------------------------------------
+StatSet = function(){
+//stats at 1/1/1/1/etc...
+	this.spellSlots = 0;
+	this.hp = 187;
+	this.defense_physical = 78;
+	this.defense_strike = 78;
+	this.defense_slash = 78;
+	this.defense_thrust = 78;
+	this.defense_magic = 78;
+	this.defense_fire = 78;
+	this.defense_lightning = 78;
+	this.defense_dark = 78;
+	this.resistance_bleed = 106;
+	this.resistance_curse = 106;
+	this.resistance_frost = 106;
+	this.resistance_poison = 106;
 
-
-// ------------------------------------------------------------
-// 					Character stat management
-//				Note: 
-//						attributes = (set) a thing the player can change (STR,DEX,ATN,etc... Maybe also current Equip Load and weapons later)
-//						stats = (calculated) a thing about the character affected by attributes (HP, FP, etc.)
-//											
-// ------------------------------------------------------------
-
-CharacterStat = function(internalName,title,description,getValueFor){
-	this.internalName = internalName;
-	this.title = title;
-	this.description = description;
-	this.getValueFor = getValueFor;
+	//TODO: Add things like item discovery, casting speed, etc.
 }
 
-CharacterStats = function(){
-	var _stats = {};
+StatsIncreases = function(csvStr){
+	var allTextLines = csvStr.split(/\r\n|\n/);//<- crowd of sunbros
+
+//collect headers
+	var headersText = allTextLines.shift().split(',');
+
+//break apart headers to their components
+	headers = headersText.map(function(header){
+		return header.split('_');
+	});
+
+//convert content lines to matrix
+	var allLines = allTextLines.map(function(line){
+		return line.split(',');
+	});
+
+//convert to nested object
+	var statIncreases = {};
+	allLines.forEach(function(line){
+		var investment = line[0];
+
+		var statIncrease = {};
+
+		for(var i=1;i<line.length;i++){
+			var header = headers[i];
+			var attributeName = header[0];
+			var stat = header[header.length-1];
+			var statValue = Number(line[i]);
+			var attributeStats = statIncrease[attributeName];
+
+			if(!attributeStats){
+				attributeStats = statIncrease[attributeName] = {};
+			}
+
+			if(stat == 'all'){
+				var category = header[1];
+
+				if(category == 'resistance'){
+					attributeStats['resistance_poison'] = statValue;
+					attributeStats['resistance_frost'] = statValue;
+					attributeStats['resistance_curse'] = statValue;
+					attributeStats['resistance_bleed'] = statValue;
+				}
+				else if(category == 'defense'){
+					attributeStats['defense_physical'] = statValue;
+					attributeStats['defense_strike'] = statValue;
+					attributeStats['defense_slash'] = statValue;
+					attributeStats['defense_thrust'] = statValue;
+					attributeStats['defense_magic'] = statValue;
+					attributeStats['defense_fire'] = statValue;
+					attributeStats['defense_lightning'] = statValue;
+					attributeStats['defense_dark'] = statValue;
+				}
+			}
+			else{
+				attributeStats[stat] = statValue;
+			}
+		}
+
+		if(!statIncreases[attributeName]){
+			statIncreases[attributeName] = [];
+		}
+
+		statIncreases[attributeName][investment] = attributeStats;
+	});
 
 	return {
-		addStat: function(characterStat){
-			_stats[characterStat.internalName] = characterStat;
-		},
-		getStat: function(statInternalName){
-			return _stats[statInternalName];
+		_statIncreases: statIncreases,
+		getStatSet: function(attributeSet){
+			var statSet = new StatSet();
+
+			for(var attrName in attributeSet){
+				var attrValue = attributeSet[attrName];
+
+				var statIncrease = this._statIncreases[attrName];
+
+				if(statIncrease){
+					var statIncreaseRow = statIncrease[attrValue];
+
+					for(var stat in statIncreaseRow){
+
+						statSet[stat] += statIncreaseRow[stat];
+					}
+				}
+
+			}
+
+			return statSet;
 		}
 	};
-}();
-
-//1-99, first nine values are dummy values
-var HP_BY_VIGOR = [403,403,403,403,403,403,403,403,403,403,427,454,483,515,550,594,638,681,723,764,804,842,879,914,947,977,1000,1019,1038,1056,1074,1092,1109,1125,1141,1157,1172,1186,1200,1213,1226,1238,1249,1260,1269,1278,1285,1292,1297,1300,1302,1304,1307,1309,1312,1314,1316,1319,1321,1323,1326,1328,1330,1333,1335,1337,1340,1342,1344,1346,1348,1351,1353,1355,1357,1359,1361,1363,1365,1367,1369,1371,1373,1375,1377,1379,1381,1383,1385,1386,1388,1390,1391,1393,1395,1396,1397,1399,1400];
-
-CharacterStats.addStat(new CharacterStat('healthPoints','Health Points (Unembered)','(Vigor)',function(characterBuild){
-	return HP_BY_VIGOR[characterBuild.getAttributeTotal('Vigor')-1];
-}));
-
-CharacterStats.addStat(new CharacterStat('emberedHealthPoints','Health Points (Embered)','(Vigor)',function(characterBuild){
-	return Math.round(HP_BY_VIGOR[characterBuild.getAttributeTotal('Vigor')-1] * 1.3);
-}));
-
-CharacterStats.addStat(new CharacterStat('equipMax','Equip Load Max','(Vitality)',function(characterBuild){
-	return characterBuild.getAttributeTotal('Vitality') + 40;
-}));
-
-CharacterStats.addStat(new CharacterStat('attunementSlots','Attunement Slots','(Attunement)',function(characterBuild){
-		var atn = characterBuild.getAttributeTotal('Attunement');
-
-		if(atn >= 99) return 10;
-		if(atn >= 80) return 9;
-		if(atn >= 60) return 8;
-		if(atn >= 50) return 7;
-		if(atn >= 40) return 6;
-		if(atn >= 30) return 5;
-		if(atn >= 24) return 4;
-		if(atn >= 18) return 3;
-		if(atn >= 14) return 2;
-		if(atn >= 10) return 1;
-		return 0;
-}));
-
-//1-99
-var FP_BY_ATTUNEMENT = [50,53,58,62,67,72,77,82,87,93,98,103,109,114,120,124,130,136,143,150,157,165,173,181,189,198,206,215,224,233,242,251,260,270,280,283,286,289,293,296,299,302,305,309,312,315,318,320,323,326,329,332,334,337,339,342,344,346,348,350,352,355,358,361,364,366,369,372,375,377,380,383,385,388,391,394,396,399,402,404,407,409,412,415,417,420,422,425,427,430,432,434,437,439,441,444,446,448,450];
-
-CharacterStats.addStat(new CharacterStat('focusPoints','Focus Points','(Attunement)',function(characterBuild){
-	return FP_BY_ATTUNEMENT[characterBuild.getAttributeTotal('Attunement')-1];
-}));
-
-CharacterStats.addStat(new CharacterStat('soulLevel','Soul Level','(All Attributes)',function(characterBuild){
-	var soulLevel = characterBuild.characterClass.baseLevel;
-
-	for(var p in characterBuild.investedAttributes){
-		soulLevel += characterBuild.investedAttributes[p];
-	}
-
-	return soulLevel;
-}));
-
-CharacterStats.addStat(new CharacterStat('stamina','Stamina','(Endurance)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('castingSpeed','Casting Speed','(Dexterity)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('physicalDefense','Physical Defense','(Vitality)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('physicalDefenseStrike','Physical Defense VS Strike','(Vitality)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('physicalDefenseSlash','Physical Defense VS Slash','(Vitality)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('physicalDefenseThrust','Physical Defense VS Thrust','(Vitality)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('magicDefense','Magic Defense','(Intelligence)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('fireDefense','Fire Defense','(Strength)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('lightningDefense','Lightning Defense','(Endurance)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('darkDefense','Dark Defense','(Faith)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('bleedResistance','Bleed Resistance','(Endurance)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('poisonResistance','Poison Resistance','(Vitality)',function(characterBuild){
-	return -1;
-}));
-
-CharacterStats.addStat(new CharacterStat('curseResistance','Curse Resistance','(Luck)',function(characterBuild){
-	return -1;
-}));
-
-var FROSTDEF_BY_VIGOR = [91,91,92,92,92,92,92,93,93,93,93,93,94,94,94,94,94,95,95,95,95,95,96,96,96,96,96,97,97,97,100,103,107,110,113,116,119,123,126,129,130,130,131,132,132,133,134,135,135,136,137,137,138,139,139,140,141,142,142,143,143,144,144,145,145,146,146,147,147,148,148,148,149,149,150,150,151,151,152,152,153,153,154,154,154,155,155,156,156,157,157,158,158,159,159,159,160,160,161];
-
-CharacterStats.addStat(new CharacterStat('frostResistance','Frost Resistance','(Vigor)',function(characterBuild){
-	return FROSTDEF_BY_VIGOR[characterBuild.getAttributeTotal('Vigor')-1];
-}));
+}
 
 // ------------------------------------------------------------
 // 					Character base classes
 // ------------------------------------------------------------
 
-CharacterAttributeSet = function(Vigor,Attunement,Endurance,Vitality,Strength,Dexterity,Intelligence,Faith,Luck){
-	this.Vigor			= Vigor;
-	this.Attunement		= Attunement;
-	this.Endurance		= Endurance;
-	this.Vitality		= Vitality;
-	this.Strength		= Strength;
-	this.Dexterity		= Dexterity;
-	this.Intelligence	= Intelligence;
-	this.Faith			= Faith;
-	this.Luck			= Luck;
+CharacterAttributeSet = function(vigor,attunement,endurance,vitality,strength,dexterity,intelligence,faith,luck){
+	this.vigor			= vigor;
+	this.attunement		= attunement;
+	this.endurance		= endurance;
+	this.vitality		= vitality;
+	this.strength		= strength;
+	this.dexterity		= dexterity;
+	this.intelligence	= intelligence;
+	this.faith			= faith;
+	this.luck			= luck;
 }
 
 CharacterClass = function(id,title,baseAttributes){
@@ -214,6 +191,16 @@ CharacterBuild.prototype.getLevel = function(){
 
 CharacterBuild.prototype.getAttributeTotal = function(attribute){
 	return this.characterClass.baseAttributes[attribute] + this.investedAttributes[attribute];
+}
+
+CharacterBuild.prototype.getAttributeTotalSet = function(){
+	var attributeTotalSet = {};
+
+	for(var attribute in this.investedAttributes){
+		attributeTotalSet[attribute] = this.characterClass.baseAttributes[attribute] + this.investedAttributes[attribute];
+	}
+
+	return attributeTotalSet;
 }
 
 CharacterBuild.prototype.setCharacterAttributeInvested = function(attribute,n){

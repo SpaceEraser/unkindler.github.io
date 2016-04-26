@@ -122,13 +122,14 @@ var AttributesSection = React.createClass({
 
 		for(var i=0;i<attributes.length;i++){
 			var baseAttribute = attributes[i];
+			var baseAttributeLookup = baseAttribute.toLowerCase();
 
 			attributeRows.push(
 				<AttributeRow 
 				key={baseAttribute} 
 				attribute={baseAttribute}
-				baseValue={baseAttributes[baseAttribute]}
-				investedValue={investedAttributes[baseAttribute]}
+				baseValue={baseAttributes[baseAttributeLookup]}
+				investedValue={investedAttributes[baseAttributeLookup]}
 				handleCharacterAttributeChange={this.props.handleCharacterAttributeChange} />			
 			);
 		}
@@ -242,13 +243,31 @@ var UnkindlerApp = React.createClass({
 	}	
 });
 
-var characterBuild = new CharacterBuild();
+$.ajax({
+    type: "GET",
+    url: "Stats/StatIncreases.csv",
+    dataType: "text",
+    success: function(csvStr) {
+    	var statsIncreases = new StatsIncreases(csvStr);
 
-ReactDOM.render(
-	<UnkindlerApp 
-		initialCharacterBuild={characterBuild}
-		classes={CharacterClasses} 
-		stats={CharacterStats}
-		nameFilter={NameFilter} />,
-	document.getElementById('unkindlerHook')
-);
+		var characterBuild = new CharacterBuild(
+			'Untitled',
+			CharacterClasses.getCharacterClassById(0),
+			new CharacterAttributeSet(75,2,4,5,0,0,0,0,0)
+		);
+
+		console.log(statsIncreases.getStatSet(characterBuild.getAttributeTotalSet()));
+
+
+return;
+		ReactDOM.render(
+			<UnkindlerApp 
+				initialCharacterBuild={characterBuild}
+				classes={CharacterClasses} 
+				stats={CharacterStats}
+				nameFilter={NameFilter} />,
+			document.getElementById('unkindlerHook')
+		);
+    }
+ });
+
