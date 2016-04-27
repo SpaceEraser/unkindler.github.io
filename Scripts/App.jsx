@@ -215,7 +215,7 @@ var UnkindlerApp = React.createClass({
 						buildStats={[
 							{title: 'Health Ponts', value: this.state.characterStats.hp},
 							{title: 'Embered HP', value: Math.round(this.state.characterStats.hp*1.3)},
-							{title: 'Equip Load Max', value: this.state.characterStats.equipMax},
+							{title: 'Equip Load Max', value: this.state.characterStats.equipLoadMax},
 							{title: 'Attunement Slots', value: this.state.characterStats.attunementSlots},
 							{title: 'Focus Points', value: this.state.characterStats.fp},
 							{title: 'Stamina', value: this.state.characterStats.stamina},

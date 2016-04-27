@@ -1,20 +1,25 @@
 //-------------------------------------------------------------
 StatSet = function(){
-//stats at 1/1/1/1/etc...
-	this.spellSlots = 0;
-	this.hp = 187;
-	this.defense_physical = 78;
-	this.defense_strike = 78;
-	this.defense_slash = 78;
-	this.defense_thrust = 78;
-	this.defense_magic = 78;
-	this.defense_fire = 78;
-	this.defense_lightning = 78;
-	this.defense_dark = 78;
-	this.resistance_bleed = 106;
-	this.resistance_curse = 106;
-	this.resistance_frost = 106;
-	this.resistance_poison = 106;
+//stats at 10/10/10/etc...
+	this.spellSlots = 1;
+	this.hp = 403;
+	this.defense_physical = 83;
+	this.defense_strike = 83;
+	this.defense_slash = 83;
+	this.defense_thrust = 83;
+	this.defense_magic = 83;
+	this.defense_fire = 83;
+	this.defense_lightning = 83;
+	this.defense_dark = 83;
+	this.resistance_bleed = 108;
+	this.resistance_curse = 108;
+	this.resistance_frost = 108;
+	this.resistance_poison = 108;
+
+	this.equipLoadMax = 50;
+	this.attunementSlots = 1;
+	this.fp = 93;
+	this.stamina = 96;
 
 	//TODO: Add things like item discovery, casting speed, etc.
 }
