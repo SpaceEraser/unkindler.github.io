@@ -35,18 +35,23 @@ var BuildNamer = React.createClass({
 	},
 	render: function(){
 		return (
-			<div className="BuilderNamer">
-					<div className="builderNamerTitle">Character Name</div>
-					<div className="nameInput">
+			<table className="BuilderNamer"><tbody>
+				<tr className="attributeRow">
+					<td className="builderNamerTitle">Character Name</td>
+					<td className="nameInput">
 						<input
 						type="text"
 						max="16"
 						onChange={this.handleNameChange}
 						value={this.state.value} />
-					</div>
-					<div className="builderNamerTitle">Other players will see:</div>
-					<div className="filteredName">{this.props.getFilteredName(this.state.value)}</div>
-			</div>
+					</td>
+				</tr>
+
+				<tr className="attributeRow">
+					<td className="builderNamerTitle">Will show as:</td>
+					<td className="builderNamerFilteredName">{this.props.getFilteredName(this.state.value)}</td>
+				</tr>
+			</tbody></table>
 		);
 	}
 });
@@ -55,16 +60,19 @@ var StatsSection = React.createClass({
 	render: function(){
 		var buildStats = this.props.buildStats.map(function(buildStat,i){
 			return(
-				<div key={buildStat.title}>
-					{buildStat.title} - {buildStat.value}
-				</div>
+				<tr key={buildStat.title}>
+					<td className="statTitle">{buildStat.title}</td>
+					<td className="statValue">{buildStat.value}</td>
+				</tr>
 			);
 		});
 
 		return(
 			<div className="buildStatsSection">
-				<div className="buildStatsSectionHeader">{this.props.title}</div>
-				{buildStats}
+				<div className="buildStatsSectionTitle">{this.props.title}</div>
+				<table className="statsTable"><tbody>
+					{buildStats}
+				</tbody></table>
 			</div>
 		);
 	}
@@ -74,7 +82,7 @@ var AttributeRow = React.createClass({
 	getInitialState: function(){
 		return {value: this.props.investedValue};
 	},
-	handleChange: function(e){
+	handleBlur:function(e){
 		var newValue = Number(e.target.value) - this.props.baseValue;
 
 		if(newValue < 0){
@@ -86,6 +94,16 @@ var AttributeRow = React.createClass({
 
 		//only bubble if the value has changed
 		if(newValue != this.state.value){
+			//this.props.handleCharacterAttributeChange(this.props.attribute.toLowerCase(),Number(newValue));
+		}
+
+		this.setState({value: newValue});
+	},
+	handleChange: function(e){
+		var newValue = Number(e.target.value) - this.props.baseValue;
+
+		//only bubble if the value has changed and is valid
+		if(newValue != this.state.value && newValue >= 0 && newValue + this.props.baseValue <= 99){
 			this.props.handleCharacterAttributeChange(this.props.attribute.toLowerCase(),Number(newValue));
 		}
 
@@ -102,6 +120,7 @@ var AttributeRow = React.createClass({
 					<input 
 					type="number"
 					onChange={this.handleChange}
+					onBlur={this.handleBlur}
 					value={this.props.baseValue + Number(this.state.value)} />
 				</span>
 			</div>
@@ -133,8 +152,7 @@ var AttributesSection = React.createClass({
 		}
 
 		return (
-			<div className="attributesSection">
-				<div className="attributesSectionHeader">Attributes</div>
+			<div className="attributeRows">
 				{attributeRows}
 			</div>
 		);
@@ -182,27 +200,37 @@ var UnkindlerApp = React.createClass({
 
 		return (
 			<div className="unkindlerApp">
-				<div className="appheader">
-					<h1 className="headerTitle"></h1>
+				<div className="appHeader">
+					<h1 className="headerTitle">Unkindler</h1>
+					<div className="subTitle">Dark Souls III Character Planner</div>
+					<nav>
+						<a href="https://github.com/Unkindler/unkindler.github.io/issues">Report an issue</a>
+					</nav>
 				</div>
+				<hr />
 				<div className="appBody">
+					<div className="buildSection attributesSection">
+						<div className="buildName">
+							<BuildNamer 
+							defaultName={characterBuild.getCharacterName()}
+							getFilteredName={this.props.nameFilter.getFilteredName}
+							handleNameChange={this.handleNameChange} />
+						</div>
 
-					<div className="buildSection">
-						<BuildNamer 
-						defaultName={characterBuild.getCharacterName()}
-						getFilteredName={this.props.nameFilter.getFilteredName}
-						handleNameChange={this.handleNameChange} />
+						<div className="attributesSectionTitle">Character Attributes</div>
 
-						<StatsSection 
-						title="Soul Level" 
-						buildStats={[
-							{title: 'Soul Level', value: characterBuild.getSoulLevel()}
-						]} />
+						<div className="attributeRow">
+							<span className="attributeTitle" >Class</span>
 
-						<ClassPicker 
-						classes={this.props.classes.getCharacterClasses()}
-						characterClass={characterBuild.characterClass}
-						handleCharacterClassChange={this.handleCharacterClassChange} />
+							<span className="attributeTitle" >&nbsp;</span>
+
+							<span>
+								<ClassPicker 
+								classes={this.props.classes.getCharacterClasses()}
+								characterClass={characterBuild.characterClass}
+								handleCharacterClassChange={this.handleCharacterClassChange} />
+							</span>
+						</div>
 
 						<AttributesSection 
 						characterBuild={characterBuild}
@@ -211,15 +239,20 @@ var UnkindlerApp = React.createClass({
 
 					<div className="buildSection">
 						<StatsSection 
+						title="Soul Level" 
+						buildStats={[
+							{title: 'Soul Level', value: characterBuild.getSoulLevel()}
+						]} />
+
+						<StatsSection 
 						title="Base Stats" 
 						buildStats={[
-							{title: 'Health Ponts', value: this.state.characterStats.hp},
+							{title: 'Unembered HP', value: this.state.characterStats.hp},
 							{title: 'Embered HP', value: Math.round(this.state.characterStats.hp*1.3)},
 							{title: 'Equip Load Max', value: this.state.characterStats.equipLoadMax},
 							{title: 'Attunement Slots', value: this.state.characterStats.attunementSlots},
 							{title: 'Focus Points', value: this.state.characterStats.fp},
 							{title: 'Stamina', value: this.state.characterStats.stamina},
-							{title: 'Casting Speed', value: this.state.characterStats.castingSpeed},
 						]}/>
 
 					</div>
