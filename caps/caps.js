@@ -99,7 +99,12 @@ $(function(){
                     labels: attributeGrowths.labels,
                     datasets: [{
                         label: attribute+chartTitleSuffix,
-                        data: attributeGrowths[viewType][attribute]
+                        data: attributeGrowths[viewType][attribute], 
+                        backgroundColor: "rgba(54,162,235,0.2)",
+                        borderColor: "rgba(54,162,235,1)",
+                        borderWidth: 1,
+                        hoverBackgroundColor: "rgba(54,162,235,0.4)",
+                        hoverBorderColor: "rgba(54,162,235,1)"
                     }]
                 },
                 options: chartOptions
