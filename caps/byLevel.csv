@@ -1,4 +1,4 @@
-attribute_investment,Vigor: HP,Endurance: Stamina,Attunement: FP,Attunement: Attunment Slots,Vitality: Equip Load Max,Luck: Item Discovery,Vitality: Physical Defense,Strength: Physical Defense,Strength: Fire Defense,Endurance: Lightning Defense,Intelligence: Magic Resistance,Faith: Dark Resistance,Strength: Attack Power,Dexterity: Attack Power,Vitality: Poison Resistance,Vigor: Frost Resistance,Endurance: Bleed Resistance,Luck: Curse
+attribute_investment,Vigor: HP,Endurance: Stamina,Attunement: FP,Attunement: Attunment Slots,Vitality: Equip Load Max,Luck: Item Discovery,Vitality: Physical Defense,Strength: Physical Defense,Strength: Fire Defense,Endurance: Lightning Defense,Intelligence: Magic Resistance,Faith: Dark Resistance,Strength: Attack Power,Dexterity: Attack Power,Vitality: Poison Resistance,Vigor: Frost Resistance,Endurance: Bleed Resistance,Luck: Curse Resistance
 10,24,0,5,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1
 11,27,1,5,0,1,1,0,0,1,1,1,1,2,2,0,0,0,0
 12,29,1,6,0,1,1,1,1,1,1,1,1,2,2,0,0,0,0
