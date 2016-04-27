@@ -62,29 +62,7 @@ StatsIncreases = function(csvStr){
 				attributeStats = statIncreases[attributeName][investment] = {};
 			}
 
-			if(stat == 'all'){
-				var category = header[1];
-
-				if(category == 'resistance'){
-					attributeStats['resistance_poison'] = statValue;
-					attributeStats['resistance_frost'] = statValue;
-					attributeStats['resistance_curse'] = statValue;
-					attributeStats['resistance_bleed'] = statValue;
-				}
-				else if(category == 'defense'){
-					attributeStats['defense_physical'] = statValue;
-					attributeStats['defense_strike'] = statValue;
-					attributeStats['defense_slash'] = statValue;
-					attributeStats['defense_thrust'] = statValue;
-					attributeStats['defense_magic'] = statValue;
-					attributeStats['defense_fire'] = statValue;
-					attributeStats['defense_lightning'] = statValue;
-					attributeStats['defense_dark'] = statValue;
-				}
-			}
-			else{
-				attributeStats[stat] = statValue;
-			}
+			attributeStats[stat] = statValue;
 
 			if(!statIncreases[attributeName]){
 				statIncreases[attributeName] = {};
